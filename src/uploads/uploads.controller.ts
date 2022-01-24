@@ -104,7 +104,10 @@ export class UploadsController
 		//console.log(unmatchedCertificates[0].data.certificate.privateKey);
 
 		//now we can do some matching
-		const pairs = [];
+		const pairs = [
+			...matchedCertificates.map(el => el.data)
+		];
+
 		for (const found of unmatchedCertificates)
 		{
 			const {certificate} = found.data;
@@ -117,11 +120,12 @@ export class UploadsController
 				{
 					pairs.push({
 						certificate,
-						privateKey,
-						publicKey
+						privateKey
 					});
 				}
 			}
 		}
+
+		console.log(pairs);
 	}
 }
