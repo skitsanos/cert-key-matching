@@ -3,7 +3,7 @@ import {ApiTags} from '@nestjs/swagger';
 import {UploadsService} from './uploads.service';
 import {ApiFiles} from './decorators/api-files.decorator';
 import {fileHeaders} from '../utils/fileHeaders';
-import {getCertificateFromFile, getPrivateKey, isPemKey} from '../utils/forgeUtils';
+import {getCertificateFromFile, getPrivateKey, isKeyMatched, isPemKey} from '../utils/forgeUtils';
 import {UploadPayload} from '../utils/schemas/UploadPayload';
 
 
@@ -100,9 +100,28 @@ export class UploadsController
 		const unmatchedCertificates = orphans.filter(el => el.type === 'certificate' && !el.data.privateKey);
 		const matchedCertificates = orphans.filter(el => el.type === 'certificate' && el.data.privateKey);
 
-		console.log(unmatchedKeys);
-		console.log(unmatchedCertificates[0].data.certificate.privateKey);
+		//console.log(unmatchedKeys);
+		//console.log(unmatchedCertificates[0].data.certificate.privateKey);
 
 		//now we can do some matching
+		const pairs = [];
+		for (const found of unmatchedCertificates)
+		{
+			const {certificate} = found.data;
+
+			for (const foundKey of unmatchedKeys)
+			{
+				const {publicKey, privateKey} = foundKey.data;
+				//compare certificate's public key with the public key generated out of private key
+				if (isKeyMatched(certificate.publicKey, publicKey))
+				{
+					pairs.push({
+						certificate,
+						privateKey,
+						publicKey
+					});
+				}
+			}
+		}
 	}
 }

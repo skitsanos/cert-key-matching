@@ -3,6 +3,8 @@ import {base64ToDerBuffer, bufferStartsWith, bufferToDerBuffer} from './bufferUt
 import {fileHeaders} from './fileHeaders';
 import {ExecResult} from './ExecResult';
 import {Buffer} from 'buffer';
+import {isEqual} from 'lodash';
+
 
 export const getPrivateKey = (file: any, password?: string): ExecResult =>
 {
@@ -22,7 +24,9 @@ export const getPrivateKey = (file: any, password?: string): ExecResult =>
 
 		try
 		{
-			return {code: 0, data: {privateKey: pki.decryptRsaPrivateKey(file.buffer, password)}};
+			const privateKey = pki.decryptRsaPrivateKey(file.buffer, password);
+			const publicKey = pki.rsa.setPublicKey(privateKey.n, privateKey.e);
+			return {code: 0, data: {privateKey, publicKey}};
 		}
 		catch (e)
 		{
@@ -195,3 +199,5 @@ export const isPemKey = (file: any): boolean =>
 		(Buffer.isBuffer(file) && file.toString().match(rx)) ||
 		(typeof file === 'object' && Object.prototype.hasOwnProperty.call(file, 'buffer') && file.buffer.toString().match(rx)));
 };
+
+export const isKeyMatched = (source: any, target: any) => isEqual(source.e, target.e) && isEqual(source.n, target.n);
