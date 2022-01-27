@@ -84,6 +84,8 @@ export class UploadsController
 					//certificate file
 					const {validity} = data.certificate;
 
+					console.log(Object.keys(data));
+
 					orphans.push({
 						type: 'certificate',
 						file: file.originalname,
@@ -110,7 +112,7 @@ export class UploadsController
 		const unmatchedCertificates = orphans.filter(el => el.type === 'certificate' && !el.data.privateKey);
 		const matchedCertificates = orphans.filter(el => el.type === 'certificate' && el.data.privateKey);
 
-		//console.log(unmatchedKeys);
+		console.log(unmatchedKeys);
 		//console.log(unmatchedCertificates[0].data.certificate.privateKey);
 
 		//now we can do some matching
@@ -158,6 +160,10 @@ export class UploadsController
 			}
 
 			this.logger.log('Certificate and keys saved');
+		}
+		else
+		{
+			throw new BadRequestException(`Failed to find certificate/key pair that can be stored`);
 		}
 	}
 }

@@ -92,8 +92,6 @@ export const getPrivateKey = (file: any, password?: string): ExecResult =>
 			return {code: 0, data: pki.privateKeyFromPem(file.toString())};
 		}
 
-		console.log('got pem');
-
 		return {code: 0, data: pki.privateKeyFromPem(file)};
 	}
 	catch (e)
@@ -190,7 +188,6 @@ export const getCertificateFromFile = (file: any, password?: string): ExecResult
 	}
 	catch (e)
 	{
-		console.log(e.message);
 		const isInvalidPassword = e.message.match(/Invalid password/giu);
 
 		return {
