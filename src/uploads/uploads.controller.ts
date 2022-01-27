@@ -3,11 +3,21 @@ import {ApiTags} from '@nestjs/swagger';
 import {UploadsService} from './uploads.service';
 import {ApiFiles} from './decorators/api-files.decorator';
 import {fileHeaders} from '../utils/fileHeaders';
-import {getCertificateFromFile, getPrivateKey, isKeyMatched, isPemKey} from '../utils/forgeUtils';
+import {
+	getCertificateFromFile,
+	getPrivateKey,
+	isKeyMatched,
+	isPemKey,
+	storeCerificate,
+	storePrivateKey
+} from '../utils/forgeUtils';
 import {UploadPayload} from '../utils/schemas/UploadPayload';
 
+import {join as pathJoin} from 'path';
 
 //https://notiz.dev/blog/type-safe-file-uploads
+
+const keysStore = pathJoin(__dirname, '../../(store)');
 
 @Controller('uploads')
 @ApiTags('uploads')
@@ -126,6 +136,28 @@ export class UploadsController
 			}
 		}
 
-		console.log(pairs);
+		if (pairs.length > 0)
+		{
+			const [foundPair] = pairs;
+			//store private key
+			const {privateKey, certificate} = foundPair;
+
+			const {code: codeKey, message: messageKey} = storePrivateKey(privateKey, pathJoin(keysStore, 'key.pem'));
+			if (codeKey > 0)
+			{
+				throw new BadRequestException(`Failed to store the private key: ${messageKey}`);
+			}
+
+			const {
+				code: codeCert,
+				message: messageCert
+			} = storeCerificate(certificate, pathJoin(keysStore, 'certificate.pem'));
+			if (codeCert > 0)
+			{
+				throw new BadRequestException(`Failed to store the private key: ${messageCert}`);
+			}
+
+			this.logger.log('Certificate and keys saved');
+		}
 	}
 }

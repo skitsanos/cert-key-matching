@@ -4,7 +4,49 @@ import {fileHeaders} from './fileHeaders';
 import {ExecResult} from './ExecResult';
 import {Buffer} from 'buffer';
 import {isEqual} from 'lodash';
+import {writeFileSync} from 'fs';
 
+export const storePrivateKey = (key: asn1.Asn1, pathToStore): ExecResult =>
+{
+	try
+	{
+		const pem = pki.privateKeyInfoToPem(key);
+		writeFileSync(pathToStore, pem, {encoding: 'utf8'});
+
+		return {
+			code: 0
+		};
+	}
+	catch (e)
+	{
+		return {
+			code: 1,
+			message: e.message
+		};
+	}
+
+};
+
+export const storeCerificate = (certificate: pki.Certificate, pathToStore): ExecResult =>
+{
+	try
+	{
+		const pem = pki.certificateToPem(certificate);
+		writeFileSync(pathToStore, pem, {encoding: 'utf8'});
+
+		return {
+			code: 0
+		};
+	}
+	catch (e)
+	{
+		return {
+			code: 1,
+			message: e.message
+		};
+	}
+
+};
 
 export const getPrivateKey = (file: any, password?: string): ExecResult =>
 {
