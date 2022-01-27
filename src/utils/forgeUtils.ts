@@ -6,11 +6,11 @@ import {Buffer} from 'buffer';
 import {isEqual} from 'lodash';
 import {writeFileSync} from 'fs';
 
-export const storePrivateKey = (key: asn1.Asn1, pathToStore): ExecResult =>
+export const storePrivateKey = (key: pki.PrivateKey, pathToStore): ExecResult =>
 {
 	try
 	{
-		const pem = pki.privateKeyInfoToPem(key);
+		const pem = pki.privateKeyToPem(key);
 		writeFileSync(pathToStore, pem, {encoding: 'utf8'});
 
 		return {

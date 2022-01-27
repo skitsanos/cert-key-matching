@@ -142,12 +142,6 @@ export class UploadsController
 			//store private key
 			const {privateKey, certificate} = foundPair;
 
-			const {code: codeKey, message: messageKey} = storePrivateKey(privateKey, pathJoin(keysStore, 'key.pem'));
-			if (codeKey > 0)
-			{
-				throw new BadRequestException(`Failed to store the private key: ${messageKey}`);
-			}
-
 			const {
 				code: codeCert,
 				message: messageCert
@@ -155,6 +149,12 @@ export class UploadsController
 			if (codeCert > 0)
 			{
 				throw new BadRequestException(`Failed to store the private key: ${messageCert}`);
+			}
+
+			const {code: codeKey, message: messageKey} = storePrivateKey(privateKey, pathJoin(keysStore, 'key.pem'));
+			if (codeKey > 0)
+			{
+				throw new BadRequestException(`Failed to store the private key: ${messageKey}`);
 			}
 
 			this.logger.log('Certificate and keys saved');
